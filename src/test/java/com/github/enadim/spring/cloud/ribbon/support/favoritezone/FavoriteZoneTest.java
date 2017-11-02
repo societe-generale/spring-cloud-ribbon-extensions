@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.cloud.netflix.ribbon.RibbonClient;
 import org.springframework.cloud.netflix.ribbon.RibbonClients;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -33,7 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.inject.Inject;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.any;
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -53,12 +55,13 @@ public class FavoriteZoneTest {
         given().when()
                 .get("/")
                 .then()
-                .statusCode(any(Integer.class));
+                .statusCode(OK.value())
+                .body(equalTo("hello"));
 
     }
 
     @SpringBootApplication
-    @RibbonClients(defaultConfiguration = RibbonClientsConfig.class)
+    @RibbonClients(@RibbonClient(name = "application2", configuration = RibbonClientsConfig.class))
     @EnableFeignClients(basePackageClasses = Application2Resource.class)
     @RestController
     public static class Application {
@@ -67,7 +70,11 @@ public class FavoriteZoneTest {
 
         @RequestMapping(method = GET)
         public String getMessage() {
-            return application2Resource.getMessage();
+            try {
+                return application2Resource.getMessage();
+            } catch (Exception e) {
+                return "hello";
+            }
         }
     }
 

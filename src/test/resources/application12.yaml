@@ -43,6 +43,10 @@ eureka:
     lease-renewal-interval-in-seconds: 3
     lease-expiration-duration-in-seconds: 3
 ribbon:
+  eager-load:
+    enabled: true
+    clients:
+      - application2
   rule:
     propagation:
       attributes:
@@ -51,10 +55,6 @@ ribbon:
     strict:
       matcher:
         enabled: false
-    favorite:
-      zone:
-        enabled: true
-        name: zone
 
 hystrix:
   command:

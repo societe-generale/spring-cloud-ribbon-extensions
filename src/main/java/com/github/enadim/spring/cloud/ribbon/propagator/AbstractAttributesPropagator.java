@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 package com.github.enadim.spring.cloud.ribbon.propagator;
 
 import com.github.enadim.spring.cloud.ribbon.api.RibbonRuleContext;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
@@ -33,6 +34,7 @@ import static com.github.enadim.spring.cloud.ribbon.api.RibbonRuleContextHolder.
  * @author Nadim Benabdenbi
  */
 @Slf4j
+@Getter
 public class AbstractAttributesPropagator<T> {
     private final Set<String> attributesToPropagate;
     private final PropagationFunction<T> propagationFunction;

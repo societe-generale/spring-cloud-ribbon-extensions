@@ -16,35 +16,36 @@
 package com.github.enadim.spring.cloud.ribbon.predicate;
 
 import com.github.enadim.spring.cloud.ribbon.support.FavoriteZoneConfig;
-import com.netflix.loadbalancer.PredicateKey;
+import com.netflix.niws.loadbalancer.DiscoveryEnabledServer;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
 
 /**
- * Filters Servers against the current micro-service zone.
+ * Filters Servers against the current micro-service instanceId.
  *
  * @author Nadim Benabdenbi
  * @see FavoriteZoneConfig for a concrete usage
  */
 @Slf4j
-public class ZoneMatcher extends NullSafeServerPredicate {
-    private final String zone;
+public class InstanceIdMatcher extends DiscoveryEnabledServerPredicate {
+    private final String instanceId;
 
-    public ZoneMatcher(@NotNull String zone) {
-        this.zone = zone;
+    public InstanceIdMatcher(@NotNull String instanceId) {
+        this.instanceId = instanceId;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean doApply(PredicateKey server) {
-        boolean accept = zone.equals(server.getServer().getZone());
-        log.trace("expected zone [{}] vs {}[zone={}] => {}",
-                zone,
-                server.getServer().getHostPort(),
-                server.getServer().getZone(),
+    protected boolean doApply(DiscoveryEnabledServer server) {
+        String actual = server.getInstanceInfo().getInstanceId();
+        boolean accept = instanceId.equals(actual);
+        log.trace("expected instanceId [{}] vs {}[{}={}] => {}",
+                instanceId,
+                server.getHostPort(),
+                server.getInstanceInfo().getInstanceId(),
                 accept);
         return accept;
     }

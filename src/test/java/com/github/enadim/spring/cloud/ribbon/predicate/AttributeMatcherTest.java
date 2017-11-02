@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,9 +21,6 @@ import com.netflix.niws.loadbalancer.DiscoveryEnabledServer;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,13 +28,15 @@ import static com.github.enadim.spring.cloud.ribbon.api.RibbonRuleContextHolder.
 import static com.github.enadim.spring.cloud.ribbon.api.RibbonRuleContextHolder.remove;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AttributeMatcherTest {
-    String                 attributeName = "name";
-    String                 defaultValue  = "value";
-    InstanceInfo           instanceInfo  = mock(InstanceInfo.class);
-    Map<String, String>    metada        = new HashMap<>();
-    DiscoveryEnabledServer server        = new DiscoveryEnabledServer(instanceInfo, true);
+    String attributeName = "name";
+    String defaultValue = "value";
+    InstanceInfo instanceInfo = mock(InstanceInfo.class);
+    Map<String, String> metada = new HashMap<>();
+    DiscoveryEnabledServer server = new DiscoveryEnabledServer(instanceInfo, true);
 
     @Before
     public void before() {

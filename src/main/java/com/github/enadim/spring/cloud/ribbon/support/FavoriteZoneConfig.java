@@ -1,12 +1,12 @@
-/**
- * Copyright (c) 2015 the original author or authors
- * <p>
+/*
+ * Copyright (c) 2017 the original author or authors
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,19 +25,16 @@ import com.netflix.loadbalancer.AvailabilityPredicate;
 import com.netflix.loadbalancer.DynamicServerListLoadBalancer;
 import com.netflix.loadbalancer.ZoneAvoidancePredicate;
 import com.netflix.niws.loadbalancer.DiscoveryEnabledNIWSServerList;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.netflix.ribbon.RibbonClientConfiguration;
 import org.springframework.cloud.netflix.ribbon.ZonePreferenceServerListFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 import static com.netflix.loadbalancer.AbstractServerPredicate.alwaysTrue;
 import static com.netflix.loadbalancer.CompositePredicate.withPredicates;
@@ -62,10 +59,12 @@ import static com.netflix.loadbalancer.CompositePredicate.withPredicates;
 @ConditionalOnClass(DiscoveryEnabledNIWSServerList.class)
 @AutoConfigureBefore(RibbonClientConfiguration.class)
 @ConditionalOnProperty(value = "ribbon.rule.favorite.zone.enabled", matchIfMissing = true)
+@ConditionalOnExpression(value = "${ribbon.client.${ribbon.client.name}.rule.favorite.zone.enabled:true}")
 @Slf4j
 public class FavoriteZoneConfig extends RuleBaseConfig {
-    @Autowired
-    protected FavoriteZoneProperties favoriteZoneProperties;
+
+    @Value("${ribbon.client.${ribbon.client.name}.rule.favorite.zone.name:${ribbon.rule.favorite.zone.name:zone}}")
+    protected String favoriteZoneName;
 
     /**
      * Favorite zone rule bean.
@@ -79,7 +78,7 @@ public class FavoriteZoneConfig extends RuleBaseConfig {
         AbstractServerPredicate availabilityPredicate = new AvailabilityPredicate(rule, clientConfig);
         AbstractServerPredicate zoneAvoidancePredicate = new ZoneAvoidancePredicate(rule, clientConfig);
         ZoneMatcher zoneMatcher = new ZoneMatcher(eurekaInstanceProperties.getZone());
-        FavoriteZoneMatcher favoriteZoneMatcher = new FavoriteZoneMatcher(favoriteZoneProperties.getName());
+        FavoriteZoneMatcher favoriteZoneMatcher = new FavoriteZoneMatcher(favoriteZoneName);
         rule.setPredicate(
                 withPredicates(favoriteZoneMatcher)
                         .addFallbackPredicate(withPredicates(zoneMatcher).build())
@@ -87,16 +86,7 @@ public class FavoriteZoneConfig extends RuleBaseConfig {
                         .addFallbackPredicate(availabilityPredicate)
                         .addFallbackPredicate(alwaysTrue())
                         .build());
-        log.info("favorite zone rule enabled for [{}].", favoriteZoneProperties.getName());
+        log.info("favorite zone rule enabled for [{}] on [{}].", clientConfig.getClientName(), favoriteZoneName);
         return rule;
-    }
-
-    @ConfigurationProperties(prefix = "ribbon.rule.favorite.zone")
-    @Component
-    @Getter
-    @Setter
-    public static class FavoriteZoneProperties {
-        private boolean enabled = true;
-        private String name;
     }
 }

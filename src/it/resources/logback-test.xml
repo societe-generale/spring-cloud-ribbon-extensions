@@ -1,4 +1,3 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
-    <logger name="com.github.enadim.spring.cloud.ribbon" level="TRACE"/>
 </configuration>

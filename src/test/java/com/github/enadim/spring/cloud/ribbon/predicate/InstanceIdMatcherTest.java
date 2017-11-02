@@ -15,46 +15,45 @@
  */
 package com.github.enadim.spring.cloud.ribbon.predicate;
 
+
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.niws.loadbalancer.DiscoveryEnabledServer;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import static com.github.enadim.spring.cloud.ribbon.api.RibbonRuleContextHolder.remove;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class StaticMatcherTest {
-    private String attributeName = "name";
-    private String expectedValue = "value";
-    private StaticMatcher predicate = new StaticMatcher(attributeName, expectedValue);
-    private InstanceInfo instanceInfo = mock(InstanceInfo.class);
-    private Map<String, String> metada = new HashMap<>();
-    private DiscoveryEnabledServer server = new DiscoveryEnabledServer(instanceInfo, true);
+public class InstanceIdMatcherTest {
+    String expected = "1";
+    InstanceInfo instanceInfo = mock(InstanceInfo.class);
+    DiscoveryEnabledServer server = new DiscoveryEnabledServer(instanceInfo, true);
+    InstanceIdMatcher predicate = new InstanceIdMatcher(expected);
 
     @Before
-    public void before() {
-        when(instanceInfo.getMetadata()).thenReturn(metada);
+    public void after() {
+        remove();
     }
 
     @Test
-    public void should_not_filter_server_with_expected_attribute_value() throws Exception {
-        metada.put(attributeName, expectedValue);
+    public void should_filter_when_favorite_zone_not_provided() {
+        assertThat(predicate.doApply(server), is(false));
+    }
+
+    @Test
+    public void should_filter_when_instanceId_is_different() {
+        when(instanceInfo.getInstanceId()).thenReturn("2");
+        server.setZone("1");
+        assertThat(predicate.doApply(server), is(false));
+    }
+
+    @Test
+    public void should_filter_when_instanceId_is_same() {
+        when(instanceInfo.getInstanceId()).thenReturn(expected);
+        server.setZone("1");
         assertThat(predicate.doApply(server), is(true));
-    }
-
-    @Test
-    public void should_filter_server_with_no_attribute() throws Exception {
-        assertThat(predicate.doApply(server), is(false));
-    }
-
-    @Test
-    public void should_filter_server_with_different_attribute_value() throws Exception {
-        metada.put(attributeName, attributeName);
-        assertThat(predicate.doApply(server), is(false));
     }
 }

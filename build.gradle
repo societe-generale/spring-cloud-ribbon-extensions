@@ -12,6 +12,7 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
+apply plugin: 'checkstyle'
 apply plugin: "jacoco"
 apply plugin: 'findbugs'
 apply plugin: 'pmd'
@@ -28,9 +29,9 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 ext {
-    jcenterUrl = !'$customJcenterUrl' ? '$customJcenterUrl' : 'https://jcenter.bintray.com/'
-    mavenUrl = !'$customMavenUrl' ? '$customMavenUrl' : 'https://repo.maven.apache.org/maven2/'
-    mavenPluginsUrl = !'$customMavenPluginsUrl' ? '$customMavenPluginsUrl' : 'https://plugins.gradle.org/m2/'
+    jcenterUrl = project.hasProperty('customJcenterUrl') ? project.customJcenterUrl : 'https://jcenter.bintray.com/'
+    mavenUrl = project.hasProperty('customMavenUrl') ? project.customMavenUrl : 'https://repo.maven.apache.org/maven2/'
+    mavenPluginsUrl = project.hasProperty('customMavenPluginsUrl') ? project.customMavenPluginsUrl : 'https://plugins.gradle.org/m2/'
 
     jvm = org.gradle.internal.jvm.Jvm.current()
     javaDescription = '' + jvm
@@ -58,11 +59,11 @@ task wrapper(type: Wrapper) {
 
 repositories {
     jcenter {
-        url "$jcenterUrl"
+        url jcenterUrl
     }
     mavenLocal()
     maven {
-        url "$mavenUrl"
+        url mavenUrl
     }
 }
 
@@ -88,6 +89,7 @@ dependencies {
         ext.optional = true
     }
 
+    testCompileOnly 'org.projectlombok:lombok:1.16.16'
     testCompile 'org.springframework.cloud:spring-cloud-starter-zuul'
     testCompile 'org.springframework.boot:spring-boot-starter-web'
     testCompile 'org.springframework.boot:spring-boot-test'
@@ -95,6 +97,19 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.11.0'
     testCompile 'net.bytebuddy:byte-buddy:1.7.4'
     testCompile 'io.rest-assured:rest-assured:3.0.3'
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+eclipse {
+    classpath {
+        downloadSources=true
+    }
 }
 
 task sourcesJar(type: Jar) {
@@ -122,6 +137,18 @@ jar {
                 'Module-Commit': gitCommitId)
     }
 }
+
+checkstyle {
+    sourceSets = [project.sourceSets.main]
+    toolVersion "8.4"
+}
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+check.dependsOn checkstyleMain
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
@@ -153,9 +180,11 @@ signing {
 
 
 license {
+    mapping {
+        java= 'SLASHSTAR_STYLE'
+    }
     header rootProject.file('HEADER')
     strictCheck true
-    skipExistingHeaders true
     include '**/*.java'
     ext.year = Calendar.getInstance().get(Calendar.YEAR)
 }

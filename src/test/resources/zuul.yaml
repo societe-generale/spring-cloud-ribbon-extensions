@@ -43,6 +43,11 @@ eureka:
     lease-expiration-duration-in-seconds: 3
 
 ribbon:
+  eager-load:
+    enabled: true
+    clients:
+      - application1
+      - application2
   rule:
     propagation:
       attributes:

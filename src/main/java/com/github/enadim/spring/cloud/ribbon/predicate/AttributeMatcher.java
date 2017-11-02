@@ -1,12 +1,12 @@
-/**
+/*
  * Copyright (c) 2017 the original author or authors
- * <p>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,8 +20,6 @@ import com.github.enadim.spring.cloud.ribbon.api.RibbonRuleContextHolder;
 import com.github.enadim.spring.cloud.ribbon.support.FavoriteZoneConfig;
 import com.netflix.niws.loadbalancer.DiscoveryEnabledServer;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Filters Servers against a specific {@link #attributeName} defined in {@link RibbonRuleContext}.
@@ -35,7 +33,7 @@ public class AttributeMatcher extends DiscoveryEnabledServerPredicate {
     private final String attributeName;
     private final String defaultValue;
 
-    public AttributeMatcher(final String attributeName, final String defaultValue) {
+    public AttributeMatcher(String attributeName, String defaultValue) {
         this.attributeName = attributeName;
         this.defaultValue = defaultValue;
     }
@@ -49,15 +47,15 @@ public class AttributeMatcher extends DiscoveryEnabledServerPredicate {
         if (expected == null) {
             expected = defaultValue;
         }
-        String  actual = server.getInstanceInfo().getMetadata().get(attributeName);
+        String actual = server.getInstanceInfo().getMetadata().get(attributeName);
         boolean accept = expected == null || expected.equals(actual);
-        log.trace("expected [{}={}] to {}[{}={}] => {}",
-                  attributeName,
-                  expected,
-                  server.getHostPort(),
-                  attributeName,
-                  actual,
-                  accept);
+        log.trace("expected [{}={}] vs {}[{}={}] => {}",
+                attributeName,
+                expected,
+                server.getHostPort(),
+                attributeName,
+                actual,
+                accept);
         return accept;
     }
 }

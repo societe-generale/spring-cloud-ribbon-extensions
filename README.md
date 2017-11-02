@@ -1,5 +1,5 @@
 # Spring Cloud Ribbon Extensions
-[![Build Status](https://travis-ci.org/enadim/spring-cloud-ribbon-extensions.svg?branch=master)](https://travis-ci.org/enadim/spring-cloud-ribbon-extensions)[![codecov](https://codecov.io/gh/enadim/spring-cloud-ribbon-extensions/branch/master/graph/badge.svg)](https://codecov.io/gh/enadim/spring-cloud-ribbon-extensions)
+[![Build Status](https://travis-ci.org/enadim/spring-cloud-ribbon-extensions.svg?branch=master)](https://travis-ci.org/enadim/spring-cloud-ribbon-extensions)[![codecov](https://codecov.io/gh/enadim/spring-cloud-ribbon-extensions/branch/master/graph/badge.svg)](https://codecov.io/gh/enadim/spring-cloud-ribbon-extensions)[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bf7e3455f2894da19b1e250173c9ace1)](https://www.codacy.com/app/enadim/spring-cloud-ribbon-extensions?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=enadim/spring-cloud-ribbon-extensions&amp;utm_campaign=Badge_Grade)
 
 
 ### Requirements
@@ -10,14 +10,15 @@
 
 ## Features
 
-### Favorite Zone Routing.
-use @EnableFavoriteZone to enable routing to a favorite zone.
+### Routing Rule
+#### Favorite Zone Routing.
+use @EnableRibbonFavoriteZone to enable routing to a favorite zone.
 
-### Strict Metadata Routing
-use @EnableStrictMetadataMatcher to enable routing to servers that have the same context metadata.
+#### Strict Metadata Routing
+use @EnableRibbonStrictMetadataMatcher to enable routing to servers that have the same context metadata.
 
 ### Context Propagation
-use @EnableContextPropagation to enable desired http headers flowing between all your micro-services.
+use @EnableRibbonContextPropagation to enable desired http headers flowing between all your micro-services.
 
 ### Combine Favorite Zone Routing & Context Propagation
 Eureka!

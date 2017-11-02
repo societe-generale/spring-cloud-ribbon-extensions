@@ -13,14 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.enadim.spring.cloud.ribbon.it.ribbon;
+package com.github.enadim.spring.cloud.ribbon;
 
-import com.github.enadim.spring.cloud.ribbon.support.EnableRibbonFavoriteZone;
-import com.github.enadim.spring.cloud.ribbon.support.EnableRibbonStrictMetadataMatcher;
-import org.springframework.context.annotation.Configuration;
+import lombok.Getter;
+import org.mockito.ArgumentMatcher;
 
-@Configuration
-@EnableRibbonStrictMetadataMatcher
-@EnableRibbonFavoriteZone
-public class RibbonClientsConfig {
+import java.io.Serializable;
+
+import static org.mockito.internal.progress.ThreadSafeMockingProgress.mockingProgress;
+
+public class ArgumentHolder<T> implements ArgumentMatcher<T>, Serializable {
+    @Getter
+    T argument;
+
+    @Override
+    public boolean matches(T argument) {
+        this.argument = argument;
+        return true;
+    }
+
+    public T eq() {
+        mockingProgress().getArgumentMatcherStorage().reportMatcher(this);
+        return argument;
+    }
 }
